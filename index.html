@@ -210,6 +210,34 @@
   .goals-line{text-align:center;font-size:12px;color:var(--grar);margin-top:8px;font-weight:600}
   .goals-line b{color:var(--gull)}
 
+  /* ---- Næst á dagskrá ---- */
+  .upnext{
+    display:flex;align-items:center;gap:12px;
+    background:var(--svart-2);border:1px solid var(--lina);
+    border-radius:14px;padding:12px 14px;margin-top:9px;
+  }
+  .upnext .un-emoji{font-size:22px}
+  .upnext .un-body{flex:1;min-width:0}
+  .upnext .un-lbl-sm{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--grar)}
+  .upnext .un-title{font-size:15px;font-weight:600;color:var(--hvitt);margin-top:2px}
+  .upnext .un-time{
+    font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;color:var(--gull);text-align:right;line-height:1;
+  }
+  .upnext .un-cd{font-size:11px;color:var(--grar);font-weight:600;text-align:right;margin-top:2px}
+
+  /* ---- Uppfæra ---- */
+  .refresh-row{display:flex;justify-content:flex-end;margin-top:12px}
+  .refresh{
+    display:inline-flex;align-items:center;gap:7px;
+    background:var(--svart-2);color:var(--gull);
+    border:1px solid var(--lina);border-radius:999px;
+    padding:8px 15px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  }
+  .refresh:active{background:var(--svart-3)}
+  .refresh .ico{display:inline-block;font-size:15px}
+  .refresh.spin .ico{animation:spin .6s linear}
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
   footer{
     text-align:center;margin-top:26px;font-size:12px;color:var(--grar);
   }
@@ -242,12 +270,28 @@
     </div>
   </div>
 
+  <div id="upnext" class="upnext" style="display:none">
+    <span class="un-emoji" id="un-emoji">📅</span>
+    <div class="un-body">
+      <div class="un-lbl-sm">Næst á dagskrá</div>
+      <div class="un-title" id="un-title">—</div>
+    </div>
+    <div>
+      <div class="un-time" id="un-time"></div>
+      <div class="un-cd" id="un-cd"></div>
+    </div>
+  </div>
+
   <div class="summary">
     <div class="stat w"><div class="num" id="s-w">0</div><div class="lbl">Sigrar</div></div>
     <div class="stat d"><div class="num" id="s-d">0</div><div class="lbl">Jafntefli</div></div>
     <div class="stat l"><div class="num" id="s-l">0</div><div class="lbl">Töp</div></div>
   </div>
   <div class="goals-line">Mörk samtals: <b id="s-goals">0–0</b></div>
+
+  <div class="refresh-row">
+    <button id="refresh" class="refresh"><span class="ico">↻</span> Uppfæra</button>
+  </div>
 
   <div class="filter">
     <button id="f-games" class="on">Bara leikir</button>
@@ -485,6 +529,45 @@ function updateNext(){
   cd.textContent = txt;
 }
 
+// Næst á dagskrá — næsta atriði hvað sem það er (leikur, matur, myndataka)
+function updateUpNext(){
+  const now = new Date();
+  const all = items.map(i=>({...i, dt:toDate(i)}));
+  // næsta atriði sem er ekki búið (leikir teljast búnir eftir MATCH_LEN)
+  const next = all
+    .filter(i=>{
+      if(i.type==='match') return now < new Date(i.dt.getTime()+MATCH_LEN*60000);
+      return i.dt > now;
+    })
+    .sort((a,b)=>a.dt-b.dt)[0];
+
+  const box = document.getElementById('upnext');
+  if(!next){ box.style.display='none'; return; }
+  box.style.display='';
+
+  const isMatch = next.type==='match';
+  document.getElementById('un-emoji').textContent = isMatch ? '⚽' : (next.emoji||'📅');
+  document.getElementById('un-title').textContent = isMatch ? `${next.home} – ${next.away}` : next.lbl;
+  document.getElementById('un-time').textContent = next.t;
+
+  const cdEl = document.getElementById('un-cd');
+  const liveNow = isMatch && now>=next.dt && now<=new Date(next.dt.getTime()+MATCH_LEN*60000);
+  if(liveNow){ cdEl.textContent = 'núna!'; return; }
+  const diff = next.dt - now;
+  const h = Math.floor(diff/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  if(h>0) cdEl.textContent = `eftir ${h} klst ${m} mín`;
+  else if(m>0) cdEl.textContent = `eftir ${m} mín`;
+  else cdEl.textContent = 'að byrja';
+}
+
+function refreshAll(){
+  updateNext();
+  updateUpNext();
+  const ae = document.activeElement;
+  if(!(ae && ae.classList && ae.classList.contains('score-in'))) render();
+}
+
 document.getElementById('f-games').onclick = function(){
   showAll=false; this.classList.add('on');
   document.getElementById('f-all').classList.remove('on'); render();
@@ -509,14 +592,19 @@ document.getElementById('schedule').addEventListener('input', function(e){
   renderSummary();
 });
 
+// Uppfæra-hnappur
+document.getElementById('refresh').onclick = function(){
+  this.classList.remove('spin');
+  void this.offsetWidth; // endurræsa snúning
+  this.classList.add('spin');
+  refreshAll();
+};
+
 render();
 updateNext();
+updateUpNext();
 // Endurhleður á 30 sek fresti — en ekki á meðan verið er að slá inn skor
-setInterval(()=>{
-  updateNext();
-  const ae = document.activeElement;
-  if(!(ae && ae.classList && ae.classList.contains('score-in'))) render();
-}, 30000);
+setInterval(refreshAll, 30000);
 </script>
 </body>
 </html>
