@@ -197,6 +197,16 @@
   .result-chip.loss{background:var(--live);color:#fff}
   .result-chip.draw{background:var(--svart-3);color:var(--grar-ljos)}
 
+  /* ---- Stig ---- */
+  .points{
+    display:flex;align-items:center;gap:10px;
+    background:var(--svart-2);border:1px solid var(--lina);border-left:3px solid var(--gull);
+    border-radius:12px;padding:12px 14px;margin-top:9px;
+  }
+  .points .pnum{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:32px;color:var(--gull);line-height:1}
+  .points .plbl{font-size:15px;font-weight:700;color:var(--hvitt)}
+  .points .phint{margin-left:auto;font-size:11px;color:var(--grar);text-align:right;line-height:1.3}
+
   /* ---- Samantekt ---- */
   .summary{display:flex;gap:8px;margin:14px 0 2px}
   .stat{
@@ -237,6 +247,15 @@
   .refresh .ico{display:inline-block;font-size:15px}
   .refresh.spin .ico{animation:spin .6s linear}
   @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+  /* ---- Sjá fyrri ---- */
+  .show-past{
+    display:block;width:100%;margin:14px 0 4px;
+    background:transparent;color:var(--grar-ljos);
+    border:1px dashed var(--lina);border-radius:12px;
+    padding:11px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  }
+  .show-past:active{background:var(--svart-2)}
 
   footer{
     text-align:center;margin-top:26px;font-size:12px;color:var(--grar);
@@ -282,6 +301,12 @@
     </div>
   </div>
 
+  <div class="points">
+    <span class="pnum" id="s-pts">0</span>
+    <span class="plbl">stig</span>
+    <span class="phint">3 fyrir sigur<br>1 fyrir jafntefli</span>
+  </div>
+
   <div class="summary">
     <div class="stat w"><div class="num" id="s-w">0</div><div class="lbl">Sigrar</div></div>
     <div class="stat d"><div class="num" id="s-d">0</div><div class="lbl">Jafntefli</div></div>
@@ -302,7 +327,8 @@
 
   <footer>
     Gangi ÍA-1 vel! ⚽<br>
-    Bein útsending á <a href="https://www.youtube.com/channel/UCnQHvY_UsVTOWKUfy0bKFug/streams" target="_blank" rel="noopener">ÍATV YouTube</a>
+    Bein útsending á <a href="https://www.youtube.com/channel/UCnQHvY_UsVTOWKUfy0bKFug/streams" target="_blank" rel="noopener">ÍATV YouTube</a><br>
+    <a href="https://github.com/eydisaegis/ia-mot/upload/main" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-size:11px;opacity:.7">⬆ Uppfæra á GitHub</a>
   </footer>
 </div>
 
@@ -399,6 +425,7 @@ function renderSummary(){
   document.getElementById('s-d').textContent=d;
   document.getElementById('s-l').textContent=l;
   document.getElementById('s-goals').textContent=`${gf}–${ga}`;
+  document.getElementById('s-pts').textContent = w*3 + d;
 }
 
 function updateChip(card, it){
@@ -412,16 +439,40 @@ function updateChip(card, it){
 }
 
 let showAll = false;
+let showPast = false;
+
+// Atriði liðið (búið)? Leikur telst liðinn 15 mín eftir byrjun.
+function isPast(it, now){
+  const start = toDate(it);
+  if(it.type==='match') return now > new Date(start.getTime()+MATCH_LEN*60000);
+  return now > start;
+}
 
 function render(){
   const sched = document.getElementById('schedule');
   sched.innerHTML = '';
   const now = new Date();
 
+  // Hvað er liðið? (til að vita hvort sýna eigi "Sjá fyrri" hnapp)
+  let pastCount = 0;
+  items.forEach(i=>{
+    if(!showAll && i.type==='event') return;
+    if(isPast(i, now)) pastCount++;
+  });
+
+  if(pastCount>0){
+    const btn = document.createElement('button');
+    btn.className = 'show-past';
+    btn.textContent = showPast ? '▾ Fela fyrri' : `▸ Sjá fyrri (${pastCount})`;
+    btn.onclick = ()=>{ showPast = !showPast; render(); };
+    sched.appendChild(btn);
+  }
+
   const days = [...new Set(items.map(i=>i.date))];
   days.forEach(date=>{
     let list = items.filter(i=>i.date===date);
     if(!showAll) list = list.filter(i=>i.type==='match');
+    if(!showPast) list = list.filter(i=> !isPast(i, now));
     if(list.length===0) return;
 
     const matchCount = items.filter(i=>i.date===date && i.type==='match').length;
