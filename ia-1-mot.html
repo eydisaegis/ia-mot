@@ -190,25 +190,12 @@
   .score-in::-webkit-outer-spin-button,.score-in::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .score-in:focus{outline:none;border-color:var(--gull)}
   .score-sep{color:var(--grar);font-weight:700;font-size:18px}
-  .score-static{
-    font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:24px;color:var(--hvitt);
-  }
   .result-chip{
     font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;margin-left:auto;
   }
   .result-chip.win{background:var(--gront);color:#06301a}
   .result-chip.loss{background:var(--live);color:#fff}
   .result-chip.draw{background:var(--svart-3);color:var(--grar-ljos)}
-
-  /* ---- Stig ---- */
-  .points{
-    display:flex;align-items:center;gap:10px;
-    background:var(--svart-2);border:1px solid var(--lina);border-left:3px solid var(--gull);
-    border-radius:12px;padding:12px 14px;margin-top:9px;
-  }
-  .points .pnum{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:32px;color:var(--gull);line-height:1}
-  .points .plbl{font-size:15px;font-weight:700;color:var(--hvitt)}
-  .points .phint{margin-left:auto;font-size:11px;color:var(--grar);text-align:right;line-height:1.3}
 
   /* ---- Samantekt ---- */
   .summary{display:flex;gap:8px;margin:14px 0 2px}
@@ -222,100 +209,6 @@
   .stat.l .num{color:var(--live)}
   .goals-line{text-align:center;font-size:12px;color:var(--grar);margin-top:8px;font-weight:600}
   .goals-line b{color:var(--gull)}
-
-  /* ---- Næst á dagskrá ---- */
-  .upnext{
-    display:flex;align-items:center;gap:12px;
-    background:var(--svart-2);border:1px solid var(--lina);
-    border-radius:14px;padding:12px 14px;margin-top:9px;
-  }
-  .upnext .un-emoji{font-size:22px}
-  .upnext .un-body{flex:1;min-width:0}
-  .upnext .un-lbl-sm{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--grar)}
-  .upnext .un-title{font-size:15px;font-weight:600;color:var(--hvitt);margin-top:2px}
-  .upnext .un-time{
-    font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;color:var(--gull);text-align:right;line-height:1;
-  }
-  .upnext .un-cd{font-size:11px;color:var(--grar);font-weight:600;text-align:right;margin-top:2px}
-
-  /* ---- Uppfæra ---- */
-  .refresh-row{display:flex;justify-content:flex-end;margin-top:12px}
-  .refresh{
-    display:inline-flex;align-items:center;gap:7px;
-    background:var(--svart-2);color:var(--gull);
-    border:1px solid var(--lina);border-radius:999px;
-    padding:8px 15px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
-  }
-  .refresh:active{background:var(--svart-3)}
-  .refresh .ico{display:inline-block;font-size:15px}
-  .refresh.spin .ico{animation:spin .6s linear}
-  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-
-  /* ---- Sjá fyrri ---- */
-  .show-past{
-    display:block;width:100%;margin:14px 0 4px;
-    background:transparent;color:var(--grar-ljos);
-    border:1px dashed var(--lina);border-radius:12px;
-    padding:11px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
-  }
-  .show-past:active{background:var(--svart-2)}
-
-  /* ---- Birta úrslit ---- */
-  .publish{
-    display:block;width:100%;
-    background:var(--gull);color:var(--svart);
-    border:none;border-radius:12px;padding:13px;
-    font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;
-  }
-  .publish:active{background:var(--gull-dökk)}
-  .publish-hint{font-size:11px;color:var(--grar);margin-top:7px;text-align:center;line-height:1.4}
-  .publish-hint b{color:var(--gull-dökk)}
-  .token-in{
-    width:100%;background:var(--svart-3);color:var(--hvitt);
-    border:1px solid var(--lina);border-radius:10px;padding:12px;
-    font-family:inherit;font-size:14px;
-  }
-  .token-in:focus{outline:none;border-color:var(--gull)}
-
-  /* ---- Vallakort ---- */
-  .btn-row{display:flex;gap:8px;margin-top:9px}
-  .map-btn{
-    display:flex;align-items:center;justify-content:center;gap:8px;flex:1;
-    background:var(--svart-2);color:var(--gull);
-    border:1px solid var(--lina);border-radius:12px;
-    padding:12px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
-  }
-  .map-btn:active{background:var(--svart-3)}
-  .map-overlay{
-    position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.95);
-    display:none;flex-direction:column;
-  }
-  .map-overlay.open{display:flex}
-  .map-bar{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:14px 16px;flex:0 0 auto;
-  }
-  .map-bar .mt{font-weight:700;font-size:15px;color:var(--hvitt)}
-  .map-close{
-    background:var(--gull);color:var(--svart);border:none;border-radius:999px;
-    width:34px;height:34px;font-size:18px;font-weight:800;cursor:pointer;line-height:1;
-  }
-  .map-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:0 10px 16px}
-  .map-scroll img{width:100%;height:auto;border-radius:10px;display:block}
-  .map-hint{text-align:center;color:var(--grar);font-size:12px;padding:6px 16px 14px;flex:0 0 auto}
-  .map-hint a{color:var(--gull)}
-
-  /* ---- Veður ---- */
-  .weather{
-    display:flex;align-items:center;gap:12px;
-    background:var(--svart-2);border:1px solid var(--lina);
-    border-radius:14px;padding:12px 14px;margin-top:9px;
-  }
-  .w-emoji{font-size:26px}
-  .w-body{flex:1;min-width:0}
-  .w-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--grar)}
-  .w-detail{font-size:13px;font-weight:600;color:var(--hvitt);margin-top:3px}
-  .w-temp{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:30px;color:var(--gull);line-height:1}
 
   footer{
     text-align:center;margin-top:26px;font-size:12px;color:var(--grar);
@@ -349,64 +242,12 @@
     </div>
   </div>
 
-  <div id="upnext" class="upnext" style="display:none">
-    <span class="un-emoji" id="un-emoji">📅</span>
-    <div class="un-body">
-      <div class="un-lbl-sm">Næst á dagskrá</div>
-      <div class="un-title" id="un-title">—</div>
-    </div>
-    <div>
-      <div class="un-time" id="un-time"></div>
-      <div class="un-cd" id="un-cd"></div>
-    </div>
-  </div>
-
-  <div id="weather" class="weather" style="display:none">
-    <span class="w-emoji" id="w-emoji">🌤️</span>
-    <div class="w-body">
-      <div class="w-lbl" id="w-lbl">Veður á Akranesi</div>
-      <div class="w-detail" id="w-detail">—</div>
-    </div>
-    <div class="w-temp" id="w-temp"></div>
-  </div>
-
-  <div class="points">
-    <span class="pnum" id="s-pts">0</span>
-    <span class="plbl">stig</span>
-    <span class="phint">3 fyrir sigur<br>1 fyrir jafntefli</span>
-  </div>
-
   <div class="summary">
     <div class="stat w"><div class="num" id="s-w">0</div><div class="lbl">Sigrar</div></div>
     <div class="stat d"><div class="num" id="s-d">0</div><div class="lbl">Jafntefli</div></div>
     <div class="stat l"><div class="num" id="s-l">0</div><div class="lbl">Töp</div></div>
   </div>
   <div class="goals-line">Mörk samtals: <b id="s-goals">0–0</b></div>
-
-  <div class="refresh-row">
-    <button id="refresh" class="refresh"><span class="ico">↻</span> Uppfæra</button>
-  </div>
-
-  <div id="edit-tools" style="display:none;margin-top:10px">
-    <div id="token-box">
-      <div class="publish-hint" style="text-align:left;margin-bottom:8px">Límdu GitHub-lykilinn þinn inn (einu sinni). Hann geymist bara í þessum síma og fer aldrei inn í síðuna sem aðrir sjá.</div>
-      <input id="token-in" class="token-in" type="password" placeholder="GitHub lykill (github_pat_…)" autocomplete="off" autocapitalize="off" spellcheck="false">
-      <button id="save-token" class="publish" style="margin-top:8px">Vista lykil</button>
-    </div>
-    <div id="save-box" style="display:none">
-      <button id="gh-save" class="publish">⬆ Vista úrslit (beint í GitHub)</button>
-      <div id="save-status" class="publish-hint"></div>
-      <div class="publish-hint" style="margin-top:6px">
-        <a href="#" id="manual-dl" style="color:var(--grar)">Hlaða niður skrá í staðinn</a> ·
-        <a href="#" id="forget-token" style="color:var(--grar)">Gleyma lykli</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="btn-row">
-    <button id="map-btn" class="map-btn">🗺️ Vallakort</button>
-    <button id="share-btn" class="map-btn">📤 Deila</button>
-  </div>
 
   <div class="filter">
     <button id="f-games" class="on">Bara leikir</button>
@@ -415,36 +256,14 @@
 
   <div id="schedule"></div>
 
-  <div id="map-overlay" class="map-overlay">
-    <div class="map-bar">
-      <span class="mt">🗺️ Vallakort — Króatía-deild</span>
-      <button id="map-close" class="map-close">✕</button>
-    </div>
-    <div class="map-scroll"><img src="vellir.webp" alt="Vallakort"></div>
-    <div class="map-hint">Klíptu til að stækka · <a href="vellir.webp" target="_blank" rel="noopener">Opna í fullri stærð</a></div>
-  </div>
-
   <footer>
     Gangi ÍA-1 vel! ⚽<br>
-    Bein útsending á <a href="https://www.youtube.com/@iatv/streams" target="_blank" rel="noopener">ÍATV YouTube</a><br>
-    <a href="https://nm.kfia.is/deild/Kroatia/IA-1" target="_blank" rel="noopener">Opinber mótssíða</a> ·
-    <a href="https://www.yr.no/en/forecast/daily-table/2-3418653/Iceland/West/Akraneskaupsta%C3%B0ur/Akranes" target="_blank" rel="noopener">Veður á Akranesi 🌤️</a><br>
-    <a id="gh-link" href="https://github.com/eydisaegis/ia-mot/upload/main" target="_blank" rel="noopener" style="display:none;margin-top:8px;font-size:11px;opacity:.7">⬆ Uppfæra á GitHub</a>
+    Bein útsending á <a href="https://www.youtube.com/channel/UCnQHvY_UsVTOWKUfy0bKFug/streams" target="_blank" rel="noopener">ÍATV YouTube</a>
   </footer>
 </div>
 
 <script>
-const TV_URL = "https://www.youtube.com/@iatv/streams";
-
-// Birt úrslit — bökuð inn í skrána (þetta sjá allir). Uppfærist þegar þú "birtir".
-/*SCORES_START*/const PUBLISHED_SCORES = {};/*SCORES_END*/
-
-// Breytihamur: aðeins með #edit í slóð sjást skorreitir + birtingarhnappur.
-const EDIT = (location.hash + location.search).toLowerCase().includes('edit');
-
-// GitHub stillingar fyrir sjálfvirka vistun
-const GH = { owner:'eydisaegis', repo:'ia-mot', path:'index.html', branch:'main' };
-
+const TV_URL = "https://www.youtube.com/channel/UCnQHvY_UsVTOWKUfy0bKFug/streams";
 
 // Allir liðir. type: 'match' eða 'event'. home/away — ÍA-1 sýnt með gulu.
 const items = [
@@ -487,7 +306,7 @@ function toDate(it){
   return new Date(y, m-1, d, hh, mm, 0);
 }
 // Áætlaður leiktími fyrir "í gangi núna" merkingu (mín.)
-const MATCH_LEN = 15;
+const MATCH_LEN = 40;
 
 function isIA(it){ return it.home==='ÍA-1' || it.away==='ÍA-1'; }
 
@@ -504,12 +323,7 @@ function meetTime(it){
 
 // ---- Úrslit: vistun í tækinu ----
 function matchId(it){ return it.date+'_'+it.t; }
-function loadScores(){
-  let local = {};
-  try{ local = JSON.parse(localStorage.getItem('ia1-scores')||'{}'); }catch(e){}
-  // Birt úrslit eru grunnur; staðbundnar breytingar (þínar) liggja yfir.
-  return Object.assign({}, PUBLISHED_SCORES, local);
-}
+function loadScores(){ try{ return JSON.parse(localStorage.getItem('ia1-scores')||'{}'); }catch(e){ return {}; } }
 function saveScores(s){ try{ localStorage.setItem('ia1-scores', JSON.stringify(s)); }catch(e){} }
 function findItem(id){ return items.find(i=> matchId(i)===id); }
 
@@ -541,7 +355,6 @@ function renderSummary(){
   document.getElementById('s-d').textContent=d;
   document.getElementById('s-l').textContent=l;
   document.getElementById('s-goals').textContent=`${gf}–${ga}`;
-  document.getElementById('s-pts').textContent = w*3 + d;
 }
 
 function updateChip(card, it){
@@ -555,40 +368,16 @@ function updateChip(card, it){
 }
 
 let showAll = false;
-let showPast = false;
-
-// Atriði liðið (búið)? Leikur telst liðinn 15 mín eftir byrjun.
-function isPast(it, now){
-  const start = toDate(it);
-  if(it.type==='match') return now > new Date(start.getTime()+MATCH_LEN*60000);
-  return now > start;
-}
 
 function render(){
   const sched = document.getElementById('schedule');
   sched.innerHTML = '';
   const now = new Date();
 
-  // Hvað er liðið? (til að vita hvort sýna eigi "Sjá fyrri" hnapp)
-  let pastCount = 0;
-  items.forEach(i=>{
-    if(!showAll && i.type==='event') return;
-    if(isPast(i, now)) pastCount++;
-  });
-
-  if(pastCount>0){
-    const btn = document.createElement('button');
-    btn.className = 'show-past';
-    btn.textContent = showPast ? '▾ Fela fyrri' : `▸ Sjá fyrri (${pastCount})`;
-    btn.onclick = ()=>{ showPast = !showPast; render(); };
-    sched.appendChild(btn);
-  }
-
   const days = [...new Set(items.map(i=>i.date))];
   days.forEach(date=>{
     let list = items.filter(i=>i.date===date);
     if(!showAll) list = list.filter(i=>i.type==='match');
-    if(!showPast) list = list.filter(i=> !isPast(i, now));
     if(list.length===0) return;
 
     const matchCount = items.filter(i=>i.date===date && i.type==='match').length;
@@ -636,13 +425,9 @@ function render(){
           ${it.tv?`<a class="tv-btn" href="${TV_URL}" target="_blank" rel="noopener">▶ Horfa á ÍATV</a>`:''}
           <div class="score">
             <span class="score-lbl">Úrslit</span>
-            ${EDIT ? `
             <input class="score-in" type="number" inputmode="numeric" min="0" max="99" data-id="${id}" data-side="h" value="${sc.h}" aria-label="Mörk ${it.home}">
             <span class="score-sep">–</span>
             <input class="score-in" type="number" inputmode="numeric" min="0" max="99" data-id="${id}" data-side="a" value="${sc.a}" aria-label="Mörk ${it.away}">
-            ` : `
-            <span class="score-static">${(sc.h!==''&&sc.h!=null)?sc.h:'–'} – ${(sc.a!==''&&sc.a!=null)?sc.a:'–'}</span>
-            `}
             <span class="result-chip ${r||''}" style="${r?'':'display:none'}">${r?RES_TXT[r]:''}</span>
           </div>
         </div>`;
@@ -700,107 +485,6 @@ function updateNext(){
   cd.textContent = txt;
 }
 
-// Næst á dagskrá — næsta atriði hvað sem það er (leikur, matur, myndataka)
-function updateUpNext(){
-  const now = new Date();
-  const all = items.map(i=>({...i, dt:toDate(i)}));
-  // næsta atriði sem er ekki búið (leikir teljast búnir eftir MATCH_LEN)
-  const next = all
-    .filter(i=>{
-      if(i.type==='match') return now < new Date(i.dt.getTime()+MATCH_LEN*60000);
-      return i.dt > now;
-    })
-    .sort((a,b)=>a.dt-b.dt)[0];
-
-  const box = document.getElementById('upnext');
-  if(!next){ box.style.display='none'; return; }
-  box.style.display='';
-
-  const isMatch = next.type==='match';
-  document.getElementById('un-emoji').textContent = isMatch ? '⚽' : (next.emoji||'📅');
-  document.getElementById('un-title').textContent = isMatch ? `${next.home} – ${next.away}` : next.lbl;
-  document.getElementById('un-time').textContent = next.t;
-
-  const cdEl = document.getElementById('un-cd');
-  const liveNow = isMatch && now>=next.dt && now<=new Date(next.dt.getTime()+MATCH_LEN*60000);
-  if(liveNow){ cdEl.textContent = 'núna!'; return; }
-  const diff = next.dt - now;
-  const h = Math.floor(diff/3600000);
-  const m = Math.floor((diff%3600000)/60000);
-  if(h>0) cdEl.textContent = `eftir ${h} klst ${m} mín`;
-  else if(m>0) cdEl.textContent = `eftir ${m} mín`;
-  else cdEl.textContent = 'að byrja';
-}
-
-function refreshAll(){
-  updateNext();
-  updateUpNext();
-  updateWeather();
-  const ae = document.activeElement;
-  if(!(ae && ae.classList && ae.classList.contains('score-in'))) render();
-}
-
-// ---- Veður (Open-Meteo, ókeypis, enginn lykill) ----
-const AKRANES = { lat:64.32, lon:-22.07 };
-let weatherData = null;
-
-function wmoInfo(code){
-  if(code===0) return ['☀️','Heiðskírt'];
-  if(code===1) return ['🌤️','Léttskýjað'];
-  if(code===2) return ['⛅','Skýjað með köflum'];
-  if(code===3) return ['☁️','Alskýjað'];
-  if(code===45||code===48) return ['🌫️','Þoka'];
-  if(code>=51&&code<=57) return ['🌦️','Súld'];
-  if(code>=61&&code<=67) return ['🌧️','Rigning'];
-  if(code>=71&&code<=77) return ['🌨️','Snjókoma'];
-  if(code>=80&&code<=82) return ['🌦️','Skúrir'];
-  if(code>=85&&code<=86) return ['🌨️','Snjóél'];
-  if(code>=95) return ['⛈️','Þrumuveður'];
-  return ['🌡️','—'];
-}
-
-function loadWeather(){
-  const u = `https://api.open-meteo.com/v1/forecast?latitude=${AKRANES.lat}&longitude=${AKRANES.lon}`
-    + `&hourly=temperature_2m,precipitation,wind_speed_10m,weather_code`
-    + `&wind_speed_unit=ms&timezone=auto&forecast_days=3`;
-  fetch(u).then(r=>{ if(!r.ok) throw new Error(); return r.json(); })
-    .then(d=>{ weatherData = d; updateWeather(); })
-    .catch(()=>{ /* sleppum — veðurhlekkur neðst er til vara */ });
-}
-
-function nearestHour(target){
-  const t = weatherData.hourly.time;
-  let best=-1, diff=Infinity;
-  for(let i=0;i<t.length;i++){
-    const d = Math.abs(new Date(t[i]) - target);
-    if(d<diff){ diff=d; best=i; }
-  }
-  return best;
-}
-
-function updateWeather(){
-  if(!weatherData) return;
-  const now = new Date();
-  const matches = items.filter(i=>i.type==='match').map(i=>({...i, dt:toDate(i)}));
-  const live = matches.find(m=> now>=m.dt && now<=new Date(m.dt.getTime()+MATCH_LEN*60000));
-  const upcoming = matches.filter(m=>m.dt>now).sort((a,b)=>a.dt-b.dt)[0];
-  const target = live ? live.dt : (upcoming ? upcoming.dt : now);
-  const i = nearestHour(target);
-  if(i<0) return;
-  const h = weatherData.hourly;
-  const [emoji, text] = wmoInfo(h.weather_code[i]);
-  document.getElementById('w-emoji').textContent = emoji;
-  document.getElementById('w-temp').textContent = Math.round(h.temperature_2m[i]) + '°';
-  document.getElementById('w-detail').textContent =
-    `${text} · vindur ${Math.round(h.wind_speed_10m[i])} m/s · úrkoma ${h.precipitation[i].toFixed(1)} mm`;
-  let lbl;
-  if(live) lbl = `Veður núna (leikur kl. ${live.t})`;
-  else if(upcoming) lbl = `Veður á tíma næsta leiks (kl. ${upcoming.t})`;
-  else lbl = 'Veður á Akranesi núna';
-  document.getElementById('w-lbl').textContent = lbl;
-  document.getElementById('weather').style.display = '';
-}
-
 document.getElementById('f-games').onclick = function(){
   showAll=false; this.classList.add('on');
   document.getElementById('f-all').classList.remove('on'); render();
@@ -825,130 +509,14 @@ document.getElementById('schedule').addEventListener('input', function(e){
   renderSummary();
 });
 
-// Uppfæra-hnappur
-document.getElementById('refresh').onclick = function(){
-  this.classList.remove('spin');
-  void this.offsetWidth; // endurræsa snúning
-  this.classList.add('spin');
-  refreshAll();
-};
-
-// Vallakort
-document.getElementById('map-btn').onclick = ()=> document.getElementById('map-overlay').classList.add('open');
-document.getElementById('map-close').onclick = ()=> document.getElementById('map-overlay').classList.remove('open');
-
-// Deila — alltaf hreina (opinbera) hlekkinn, ekki #edit
-document.getElementById('share-btn').onclick = function(){
-  const url = location.origin + location.pathname;
-  if(navigator.share){
-    navigator.share({ title:'ÍA-1 á Norðurálsmóti', text:'Dagskrá, úrslit og vallakort ÍA-1', url }).catch(()=>{});
-  } else if(navigator.clipboard){
-    navigator.clipboard.writeText(url).then(()=> alert('Hlekkur afritaður:\n'+url)).catch(()=> prompt('Afritaðu hlekkinn:', url));
-  } else {
-    prompt('Afritaðu hlekkinn:', url);
-  }
-};
-
-// ---- Birta úrslit ----
-// UTF-8 öruggt base64 (íslenskir stafir)
-function utf8ToB64(str){
-  const bytes = new TextEncoder().encode(str);
-  let bin=''; const chunk=0x8000;
-  for(let i=0;i<bytes.length;i+=chunk){ bin += String.fromCharCode.apply(null, bytes.subarray(i,i+chunk)); }
-  return btoa(bin);
-}
-function b64ToUtf8(b64){
-  const bin = atob(b64.replace(/\s/g,''));
-  const bytes = new Uint8Array(bin.length);
-  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
-  return new TextDecoder().decode(bytes);
-}
-function bakeScores(src){
-  const json = JSON.stringify(loadScores());
-  const newLine = `/*SCORES_START*/const PUBLISHED_SCORES = ${json};/*SCORES_END*/`;
-  return src.replace(/\/\*SCORES_START\*\/[\s\S]*?\/\*SCORES_END\*\//, newLine);
-}
-function status(msg){ const el=document.getElementById('save-status'); if(el) el.textContent=msg; }
-
-// Beint í GitHub með lyklinum
-async function saveToGitHub(){
-  const token = localStorage.getItem('ia1-gh-token');
-  if(!token){ status('Enginn lykill.'); return; }
-  const btn = document.getElementById('gh-save');
-  btn.disabled = true;
-  status('Vista í GitHub…');
-  try{
-    const base = `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH.path}`;
-    const hdr = { Authorization:`Bearer ${token}`, Accept:'application/vnd.github+json' };
-    // 1) Sækja núverandi skrá (sha + innihald)
-    const g = await fetch(`${base}?ref=${GH.branch}&t=${Date.now()}`, {headers:hdr, cache:'no-store'});
-    if(!g.ok) throw new Error('Sækja '+g.status);
-    const data = await g.json();
-    const out = bakeScores(b64ToUtf8(data.content));
-    // 2) Skrifa uppfærða skrá
-    const p = await fetch(base, {
-      method:'PUT',
-      headers:{...hdr, 'Content-Type':'application/json'},
-      body: JSON.stringify({ message:'Uppfæra úrslit', content: utf8ToB64(out), sha: data.sha, branch: GH.branch })
-    });
-    if(!p.ok) throw new Error('Skrifa '+p.status);
-    status('✓ Vistað! Aðrir sjá það innan mínútu.');
-  }catch(e){
-    let m = e.message;
-    if(m.includes('401')||m.includes('403')) m = 'lykill rangur eða útrunninn';
-    if(m.includes('404')) m = 'finn ekki geymsluna (athugaðu lykil)';
-    status('Villa: '+m+'. Reyndu aftur eða notaðu niðurhal.');
-  }finally{
-    btn.disabled = false;
-  }
-}
-
-// Varaleið: hlaða niður skrá (ef GitHub-skrift bregst)
-function manualDownload(){
-  fetch(location.href, {cache:'no-store'}).then(r=>r.text()).then(src=>{
-    const blob = new Blob([bakeScores(src)], {type:'text/html'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href=url; a.download='index.html';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(url),2000);
-    status('Skrá hlaðin niður — hladdu henni upp á GitHub handvirkt.');
-  }).catch(()=>status('Næ ekki í skrána. Ertu á github.io slóðinni?'));
-}
-
-function refreshTokenUI(){
-  const has = !!localStorage.getItem('ia1-gh-token');
-  document.getElementById('token-box').style.display = has ? 'none' : '';
-  document.getElementById('save-box').style.display = has ? '' : 'none';
-}
-
-// Sýna breytitól aðeins í breytiham
-if(EDIT){
-  document.getElementById('edit-tools').style.display = '';
-  const gh = document.getElementById('gh-link'); if(gh) gh.style.display = '';
-  refreshTokenUI();
-  document.getElementById('save-token').onclick = function(){
-    const v = document.getElementById('token-in').value.trim();
-    if(!v){ return; }
-    localStorage.setItem('ia1-gh-token', v);
-    document.getElementById('token-in').value='';
-    refreshTokenUI();
-    status('Lykill vistaður.');
-  };
-  document.getElementById('gh-save').onclick = saveToGitHub;
-  document.getElementById('manual-dl').onclick = function(e){ e.preventDefault(); manualDownload(); };
-  document.getElementById('forget-token').onclick = function(e){
-    e.preventDefault();
-    localStorage.removeItem('ia1-gh-token');
-    refreshTokenUI(); status('Lykli gleymt.');
-  };
-}
-
 render();
 updateNext();
-updateUpNext();
-loadWeather();
 // Endurhleður á 30 sek fresti — en ekki á meðan verið er að slá inn skor
-setInterval(refreshAll, 30000);
+setInterval(()=>{
+  updateNext();
+  const ae = document.activeElement;
+  if(!(ae && ae.classList && ae.classList.contains('score-in'))) render();
+}, 30000);
 </script>
 </body>
 </html>
