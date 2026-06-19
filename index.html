@@ -190,6 +190,9 @@
   .score-in::-webkit-outer-spin-button,.score-in::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .score-in:focus{outline:none;border-color:var(--gull)}
   .score-sep{color:var(--grar);font-weight:700;font-size:18px}
+  .score-static{
+    font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:24px;color:var(--hvitt);
+  }
   .result-chip{
     font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;margin-left:auto;
   }
@@ -257,6 +260,17 @@
   }
   .show-past:active{background:var(--svart-2)}
 
+  /* ---- Birta úrslit ---- */
+  .publish{
+    display:block;width:100%;
+    background:var(--gull);color:var(--svart);
+    border:none;border-radius:12px;padding:13px;
+    font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;
+  }
+  .publish:active{background:var(--gull-dökk)}
+  .publish-hint{font-size:11px;color:var(--grar);margin-top:7px;text-align:center;line-height:1.4}
+  .publish-hint b{color:var(--gull-dökk)}
+
   footer{
     text-align:center;margin-top:26px;font-size:12px;color:var(--grar);
   }
@@ -318,6 +332,11 @@
     <button id="refresh" class="refresh"><span class="ico">↻</span> Uppfæra</button>
   </div>
 
+  <div id="edit-tools" style="display:none;margin-top:10px">
+    <button id="publish" class="publish">⬇ Vista úrslit til að birta</button>
+    <div class="publish-hint">Þetta hleður niður uppfærðri <b>index.html</b>. Ýttu svo á „Uppfæra á GitHub" neðst og veldu þá skrá.</div>
+  </div>
+
   <div class="filter">
     <button id="f-games" class="on">Bara leikir</button>
     <button id="f-all">Allt (matur ofl.)</button>
@@ -328,12 +347,19 @@
   <footer>
     Gangi ÍA-1 vel! ⚽<br>
     Bein útsending á <a href="https://www.youtube.com/channel/UCnQHvY_UsVTOWKUfy0bKFug/streams" target="_blank" rel="noopener">ÍATV YouTube</a><br>
-    <a href="https://github.com/eydisaegis/ia-mot/upload/main" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-size:11px;opacity:.7">⬆ Uppfæra á GitHub</a>
+    <a id="gh-link" href="https://github.com/eydisaegis/ia-mot/upload/main" target="_blank" rel="noopener" style="display:none;margin-top:8px;font-size:11px;opacity:.7">⬆ Uppfæra á GitHub</a>
   </footer>
 </div>
 
 <script>
 const TV_URL = "https://www.youtube.com/channel/UCnQHvY_UsVTOWKUfy0bKFug/streams";
+
+// Birt úrslit — bökuð inn í skrána (þetta sjá allir). Uppfærist þegar þú "birtir".
+/*SCORES_START*/const PUBLISHED_SCORES = {};/*SCORES_END*/
+
+// Breytihamur: aðeins með #edit í slóð sjást skorreitir + birtingarhnappur.
+const EDIT = (location.hash + location.search).toLowerCase().includes('edit');
+
 
 // Allir liðir. type: 'match' eða 'event'. home/away — ÍA-1 sýnt með gulu.
 const items = [
@@ -393,7 +419,12 @@ function meetTime(it){
 
 // ---- Úrslit: vistun í tækinu ----
 function matchId(it){ return it.date+'_'+it.t; }
-function loadScores(){ try{ return JSON.parse(localStorage.getItem('ia1-scores')||'{}'); }catch(e){ return {}; } }
+function loadScores(){
+  let local = {};
+  try{ local = JSON.parse(localStorage.getItem('ia1-scores')||'{}'); }catch(e){}
+  // Birt úrslit eru grunnur; staðbundnar breytingar (þínar) liggja yfir.
+  return Object.assign({}, PUBLISHED_SCORES, local);
+}
 function saveScores(s){ try{ localStorage.setItem('ia1-scores', JSON.stringify(s)); }catch(e){} }
 function findItem(id){ return items.find(i=> matchId(i)===id); }
 
@@ -520,9 +551,13 @@ function render(){
           ${it.tv?`<a class="tv-btn" href="${TV_URL}" target="_blank" rel="noopener">▶ Horfa á ÍATV</a>`:''}
           <div class="score">
             <span class="score-lbl">Úrslit</span>
+            ${EDIT ? `
             <input class="score-in" type="number" inputmode="numeric" min="0" max="99" data-id="${id}" data-side="h" value="${sc.h}" aria-label="Mörk ${it.home}">
             <span class="score-sep">–</span>
             <input class="score-in" type="number" inputmode="numeric" min="0" max="99" data-id="${id}" data-side="a" value="${sc.a}" aria-label="Mörk ${it.away}">
+            ` : `
+            <span class="score-static">${(sc.h!==''&&sc.h!=null)?sc.h:'–'} – ${(sc.a!==''&&sc.a!=null)?sc.a:'–'}</span>
+            `}
             <span class="result-chip ${r||''}" style="${r?'':'display:none'}">${r?RES_TXT[r]:''}</span>
           </div>
         </div>`;
@@ -650,6 +685,35 @@ document.getElementById('refresh').onclick = function(){
   this.classList.add('spin');
   refreshAll();
 };
+
+// ---- Birta úrslit: baka núverandi úrslit inn í nýja index.html ----
+function publishScores(){
+  const merged = loadScores();
+  const json = JSON.stringify(merged);
+  fetch(location.href, {cache:'no-store'})
+    .then(r=>{ if(!r.ok) throw new Error('fetch'); return r.text(); })
+    .then(src=>{
+      const newLine = `/*SCORES_START*/const PUBLISHED_SCORES = ${json};/*SCORES_END*/`;
+      const out = src.replace(/\/\*SCORES_START\*\/[\s\S]*?\/\*SCORES_END\*\//, newLine);
+      const blob = new Blob([out], {type:'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'index.html';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(url), 2000);
+    })
+    .catch(()=>{
+      alert('Næ ekki í skrána til að uppfæra. Þetta virkar þegar síðan er opnuð á github.io slóðinni (ekki úr Skrám).');
+    });
+}
+
+// Sýna breytitól + GitHub-hlekk aðeins í breytiham
+if(EDIT){
+  document.getElementById('edit-tools').style.display = '';
+  document.getElementById('publish').onclick = publishScores;
+  const gh = document.getElementById('gh-link');
+  if(gh) gh.style.display = '';
+}
 
 render();
 updateNext();
