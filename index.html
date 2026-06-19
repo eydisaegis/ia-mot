@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ÍA-1 · Mótsdagskrá</title>
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<meta name="apple-mobile-web-app-title" content="ÍA-1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#111110">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -200,6 +206,22 @@
   .result-chip.loss{background:var(--live);color:#fff}
   .result-chip.draw{background:var(--svart-3);color:var(--grar-ljos)}
 
+  /* ---- Foreldra-skilaboð ---- */
+  .info-card{
+    display:flex;gap:12px;align-items:flex-start;
+    background:rgba(255,203,5,.08);border:1px solid rgba(255,203,5,.25);
+    border-radius:14px;padding:13px 15px;margin-top:9px;
+  }
+  .info-ico{font-size:20px;flex:0 0 auto}
+  .info-body{font-size:14px;line-height:1.5;color:var(--hvitt);white-space:normal;word-break:break-word}
+  .info-body a{color:var(--gull)}
+  .info-ta{
+    width:100%;background:var(--svart-3);color:var(--hvitt);
+    border:1px solid var(--lina);border-radius:10px;padding:11px;
+    font-family:inherit;font-size:14px;line-height:1.4;resize:vertical;
+  }
+  .info-ta:focus{outline:none;border-color:var(--gull)}
+
   /* ---- Stig ---- */
   .points{
     display:flex;align-items:center;gap:10px;
@@ -349,6 +371,11 @@
     </div>
   </div>
 
+  <div id="info-card" class="info-card" style="display:none">
+    <span class="info-ico">📣</span>
+    <div id="info-body" class="info-body"></div>
+  </div>
+
   <div id="upnext" class="upnext" style="display:none">
     <span class="un-emoji" id="un-emoji">📅</span>
     <div class="un-body">
@@ -388,13 +415,17 @@
   </div>
 
   <div id="edit-tools" style="display:none;margin-top:10px">
+    <div style="margin-bottom:12px">
+      <div class="publish-hint" style="text-align:left;margin-bottom:6px">📣 Skilaboð til foreldra (sjást hjá öllum eftir að þú vistar):</div>
+      <textarea id="info-edit" class="info-ta" rows="3" placeholder="T.d. Hittumst við sjoppuna kl. 11 fyrir leikinn 🙂"></textarea>
+    </div>
     <div id="token-box">
       <div class="publish-hint" style="text-align:left;margin-bottom:8px">Límdu GitHub-lykilinn þinn inn (einu sinni). Hann geymist bara í þessum síma og fer aldrei inn í síðuna sem aðrir sjá.</div>
       <input id="token-in" class="token-in" type="password" placeholder="GitHub lykill (github_pat_…)" autocomplete="off" autocapitalize="off" spellcheck="false">
       <button id="save-token" class="publish" style="margin-top:8px">Vista lykil</button>
     </div>
     <div id="save-box" style="display:none">
-      <button id="gh-save" class="publish">⬆ Vista úrslit (beint í GitHub)</button>
+      <button id="gh-save" class="publish">⬆ Vista & birta (úrslit + skilaboð)</button>
       <div id="save-status" class="publish-hint"></div>
       <div class="publish-hint" style="margin-top:6px">
         <a href="#" id="manual-dl" style="color:var(--grar)">Hlaða niður skrá í staðinn</a> ·
@@ -437,7 +468,10 @@
 const TV_URL = "https://www.youtube.com/@iatv/streams";
 
 // Birt úrslit — bökuð inn í skrána (þetta sjá allir). Uppfærist þegar þú "birtir".
-/*SCORES_START*/const PUBLISHED_SCORES = {"2026-06-19_15:45":{"h":"0","a":"4"},"2026-06-20_08:30":{"h":"","a":""},"2026-06-20_09:15":{"h":"","a":""},"2026-06-19_16:30":{"h":"2","a":"3"},"2026-06-19_17:15":{"h":"1","a":"0"},"2026-06-19_18:00":{"h":"1","a":"2"}};/*SCORES_END*/
+/*SCORES_START*/const PUBLISHED_SCORES = {};/*SCORES_END*/
+
+// Skilaboð til foreldra — bökuð inn í skrána (þetta sjá allir).
+/*INFO_START*/const PUBLISHED_INFO = "";/*INFO_END*/
 
 // Breytihamur: aðeins með #edit í slóð sjást skorreitir + birtingarhnappur.
 const EDIT = (location.hash + location.search).toLowerCase().includes('edit');
@@ -866,7 +900,32 @@ function b64ToUtf8(b64){
 function bakeScores(src){
   const json = JSON.stringify(loadScores());
   const newLine = `/*SCORES_START*/const PUBLISHED_SCORES = ${json};/*SCORES_END*/`;
-  return src.replace(/\/\*SCORES_START\*\/[\s\S]*?\/\*SCORES_END\*\//, newLine);
+  let out = src.replace(/\/\*SCORES_START\*\/[\s\S]*?\/\*SCORES_END\*\//, newLine);
+  const info = `/*INFO_START*/const PUBLISHED_INFO = ${JSON.stringify(loadInfo())};/*INFO_END*/`;
+  out = out.replace(/\/\*INFO_START\*\/[\s\S]*?\/\*INFO_END\*\//, info);
+  return out;
+}
+
+// ---- Skilaboð til foreldra ----
+function loadInfo(){
+  const local = localStorage.getItem('ia1-info');
+  return local !== null ? local : PUBLISHED_INFO;
+}
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function renderInfo(){
+  const txt = loadInfo();
+  const card = document.getElementById('info-card');
+  const body = document.getElementById('info-body');
+  if(txt && txt.trim()){
+    body.innerHTML = escapeHtml(txt)
+      .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>')
+      .replace(/\n/g, '<br>');
+    card.style.display = '';
+  } else {
+    card.style.display = 'none';
+  }
+  const ta = document.getElementById('info-edit');
+  if(ta && document.activeElement !== ta) ta.value = txt;
 }
 function status(msg){ const el=document.getElementById('save-status'); if(el) el.textContent=msg; }
 
@@ -926,6 +985,11 @@ if(EDIT){
   document.getElementById('edit-tools').style.display = '';
   const gh = document.getElementById('gh-link'); if(gh) gh.style.display = '';
   refreshTokenUI();
+  const ta = document.getElementById('info-edit');
+  if(ta){
+    ta.value = loadInfo();
+    ta.oninput = ()=>{ localStorage.setItem('ia1-info', ta.value); renderInfo(); };
+  }
   document.getElementById('save-token').onclick = function(){
     const v = document.getElementById('token-in').value.trim();
     if(!v){ return; }
@@ -946,6 +1010,7 @@ if(EDIT){
 render();
 updateNext();
 updateUpNext();
+renderInfo();
 loadWeather();
 // Endurhleður á 30 sek fresti — en ekki á meðan verið er að slá inn skor
 setInterval(refreshAll, 30000);
