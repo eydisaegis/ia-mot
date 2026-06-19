@@ -270,6 +270,12 @@
   .publish:active{background:var(--gull-dökk)}
   .publish-hint{font-size:11px;color:var(--grar);margin-top:7px;text-align:center;line-height:1.4}
   .publish-hint b{color:var(--gull-dökk)}
+  .token-in{
+    width:100%;background:var(--svart-3);color:var(--hvitt);
+    border:1px solid var(--lina);border-radius:10px;padding:12px;
+    font-family:inherit;font-size:14px;
+  }
+  .token-in:focus{outline:none;border-color:var(--gull)}
 
   footer{
     text-align:center;margin-top:26px;font-size:12px;color:var(--grar);
@@ -333,8 +339,19 @@
   </div>
 
   <div id="edit-tools" style="display:none;margin-top:10px">
-    <button id="publish" class="publish">⬇ Vista úrslit til að birta</button>
-    <div class="publish-hint">Þetta hleður niður uppfærðri <b>index.html</b>. Ýttu svo á „Uppfæra á GitHub" neðst og veldu þá skrá.</div>
+    <div id="token-box">
+      <div class="publish-hint" style="text-align:left;margin-bottom:8px">Límdu GitHub-lykilinn þinn inn (einu sinni). Hann geymist bara í þessum síma og fer aldrei inn í síðuna sem aðrir sjá.</div>
+      <input id="token-in" class="token-in" type="password" placeholder="GitHub lykill (github_pat_…)" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button id="save-token" class="publish" style="margin-top:8px">Vista lykil</button>
+    </div>
+    <div id="save-box" style="display:none">
+      <button id="gh-save" class="publish">⬆ Vista úrslit (beint í GitHub)</button>
+      <div id="save-status" class="publish-hint"></div>
+      <div class="publish-hint" style="margin-top:6px">
+        <a href="#" id="manual-dl" style="color:var(--grar)">Hlaða niður skrá í staðinn</a> ·
+        <a href="#" id="forget-token" style="color:var(--grar)">Gleyma lykli</a>
+      </div>
+    </div>
   </div>
 
   <div class="filter">
@@ -355,10 +372,13 @@
 const TV_URL = "https://www.youtube.com/channel/UCnQHvY_UsVTOWKUfy0bKFug/streams";
 
 // Birt úrslit — bökuð inn í skrána (þetta sjá allir). Uppfærist þegar þú "birtir".
-/*SCORES_START*/const PUBLISHED_SCORES = {"2026-06-19_15:45":{"h":"0","a":"4"},"2026-06-20_08:30":{"h":"","a":""},"2026-06-20_09:15":{"h":"","a":""},"2026-06-19_16:30":{"h":"2","a":"3"},"2026-06-19_17:15":{"h":"1","a":"0"},"2026-06-19_18:00":{"h":"1","a":"2"}};/*SCORES_END*/
+/*SCORES_START*/const PUBLISHED_SCORES = {};/*SCORES_END*/
 
 // Breytihamur: aðeins með #edit í slóð sjást skorreitir + birtingarhnappur.
 const EDIT = (location.hash + location.search).toLowerCase().includes('edit');
+
+// GitHub stillingar fyrir sjálfvirka vistun
+const GH = { owner:'eydisaegis', repo:'ia-mot', path:'index.html', branch:'main' };
 
 
 // Allir liðir. type: 'match' eða 'event'. home/away — ÍA-1 sýnt með gulu.
@@ -686,33 +706,98 @@ document.getElementById('refresh').onclick = function(){
   refreshAll();
 };
 
-// ---- Birta úrslit: baka núverandi úrslit inn í nýja index.html ----
-function publishScores(){
-  const merged = loadScores();
-  const json = JSON.stringify(merged);
-  fetch(location.href, {cache:'no-store'})
-    .then(r=>{ if(!r.ok) throw new Error('fetch'); return r.text(); })
-    .then(src=>{
-      const newLine = `/*SCORES_START*/const PUBLISHED_SCORES = ${json};/*SCORES_END*/`;
-      const out = src.replace(/\/\*SCORES_START\*\/[\s\S]*?\/\*SCORES_END\*\//, newLine);
-      const blob = new Blob([out], {type:'text/html'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'index.html';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(()=>URL.revokeObjectURL(url), 2000);
-    })
-    .catch(()=>{
-      alert('Næ ekki í skrána til að uppfæra. Þetta virkar þegar síðan er opnuð á github.io slóðinni (ekki úr Skrám).');
+// ---- Birta úrslit ----
+// UTF-8 öruggt base64 (íslenskir stafir)
+function utf8ToB64(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin=''; const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){ bin += String.fromCharCode.apply(null, bytes.subarray(i,i+chunk)); }
+  return btoa(bin);
+}
+function b64ToUtf8(b64){
+  const bin = atob(b64.replace(/\s/g,''));
+  const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+function bakeScores(src){
+  const json = JSON.stringify(loadScores());
+  const newLine = `/*SCORES_START*/const PUBLISHED_SCORES = ${json};/*SCORES_END*/`;
+  return src.replace(/\/\*SCORES_START\*\/[\s\S]*?\/\*SCORES_END\*\//, newLine);
+}
+function status(msg){ const el=document.getElementById('save-status'); if(el) el.textContent=msg; }
+
+// Beint í GitHub með lyklinum
+async function saveToGitHub(){
+  const token = localStorage.getItem('ia1-gh-token');
+  if(!token){ status('Enginn lykill.'); return; }
+  const btn = document.getElementById('gh-save');
+  btn.disabled = true;
+  status('Vista í GitHub…');
+  try{
+    const base = `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH.path}`;
+    const hdr = { Authorization:`Bearer ${token}`, Accept:'application/vnd.github+json' };
+    // 1) Sækja núverandi skrá (sha + innihald)
+    const g = await fetch(`${base}?ref=${GH.branch}&t=${Date.now()}`, {headers:hdr, cache:'no-store'});
+    if(!g.ok) throw new Error('Sækja '+g.status);
+    const data = await g.json();
+    const out = bakeScores(b64ToUtf8(data.content));
+    // 2) Skrifa uppfærða skrá
+    const p = await fetch(base, {
+      method:'PUT',
+      headers:{...hdr, 'Content-Type':'application/json'},
+      body: JSON.stringify({ message:'Uppfæra úrslit', content: utf8ToB64(out), sha: data.sha, branch: GH.branch })
     });
+    if(!p.ok) throw new Error('Skrifa '+p.status);
+    status('✓ Vistað! Aðrir sjá það innan mínútu.');
+  }catch(e){
+    let m = e.message;
+    if(m.includes('401')||m.includes('403')) m = 'lykill rangur eða útrunninn';
+    if(m.includes('404')) m = 'finn ekki geymsluna (athugaðu lykil)';
+    status('Villa: '+m+'. Reyndu aftur eða notaðu niðurhal.');
+  }finally{
+    btn.disabled = false;
+  }
 }
 
-// Sýna breytitól + GitHub-hlekk aðeins í breytiham
+// Varaleið: hlaða niður skrá (ef GitHub-skrift bregst)
+function manualDownload(){
+  fetch(location.href, {cache:'no-store'}).then(r=>r.text()).then(src=>{
+    const blob = new Blob([bakeScores(src)], {type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='index.html';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),2000);
+    status('Skrá hlaðin niður — hladdu henni upp á GitHub handvirkt.');
+  }).catch(()=>status('Næ ekki í skrána. Ertu á github.io slóðinni?'));
+}
+
+function refreshTokenUI(){
+  const has = !!localStorage.getItem('ia1-gh-token');
+  document.getElementById('token-box').style.display = has ? 'none' : '';
+  document.getElementById('save-box').style.display = has ? '' : 'none';
+}
+
+// Sýna breytitól aðeins í breytiham
 if(EDIT){
   document.getElementById('edit-tools').style.display = '';
-  document.getElementById('publish').onclick = publishScores;
-  const gh = document.getElementById('gh-link');
-  if(gh) gh.style.display = '';
+  const gh = document.getElementById('gh-link'); if(gh) gh.style.display = '';
+  refreshTokenUI();
+  document.getElementById('save-token').onclick = function(){
+    const v = document.getElementById('token-in').value.trim();
+    if(!v){ return; }
+    localStorage.setItem('ia1-gh-token', v);
+    document.getElementById('token-in').value='';
+    refreshTokenUI();
+    status('Lykill vistaður.');
+  };
+  document.getElementById('gh-save').onclick = saveToGitHub;
+  document.getElementById('manual-dl').onclick = function(e){ e.preventDefault(); manualDownload(); };
+  document.getElementById('forget-token').onclick = function(e){
+    e.preventDefault();
+    localStorage.removeItem('ia1-gh-token');
+    refreshTokenUI(); status('Lykli gleymt.');
+  };
 }
 
 render();
