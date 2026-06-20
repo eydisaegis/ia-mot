@@ -343,6 +343,19 @@
     text-align:center;margin-top:26px;font-size:12px;color:var(--grar);
   }
   footer a{color:var(--gull);text-decoration:none}
+
+  /* ---- Draga niður til að uppfæra ---- */
+  .pull-ind{
+    position:fixed;top:10px;left:50%;z-index:60;
+    width:40px;height:40px;border-radius:50%;
+    background:var(--svart-3);border:1px solid var(--lina);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--gull);font-size:20px;font-weight:700;
+    opacity:0;transform:translateX(-50%) translateY(-10px);
+    pointer-events:none;
+  }
+  .pull-ind.ready{background:var(--gull);color:var(--svart);border-color:var(--gull)}
+  .pull-ind.spinning #pull-ico{animation:spin .7s linear infinite}
   .hidden{display:none !important}
 
   @media (prefers-reduced-motion:reduce){
@@ -351,6 +364,8 @@
 </style>
 </head>
 <body>
+
+<div id="pull-ind" class="pull-ind"><span id="pull-ico">↻</span></div>
 
 <header>
   <div class="crest">ÍA</div>
@@ -468,7 +483,7 @@
 const TV_URL = "https://www.youtube.com/@iatv/streams";
 
 // Birt úrslit — bökuð inn í skrána (þetta sjá allir). Uppfærist þegar þú "birtir".
-/*SCORES_START*/const PUBLISHED_SCORES = {"2026-06-19_15:45":{"h":"0","a":"4"},"2026-06-20_08:30":{"h":"0","a":"3"},"2026-06-20_09:15":{"h":"3","a":"1"},"2026-06-19_16:30":{"h":"2","a":"3"},"2026-06-19_17:15":{"h":"1","a":"0"},"2026-06-19_18:00":{"h":"1","a":"2"}};/*SCORES_END*/
+/*SCORES_START*/const PUBLISHED_SCORES = {};/*SCORES_END*/
 
 // Skilaboð til foreldra — bökuð inn í skrána (þetta sjá allir).
 /*INFO_START*/const PUBLISHED_INFO = "";/*INFO_END*/
@@ -1014,6 +1029,48 @@ renderInfo();
 loadWeather();
 // Endurhleður á 30 sek fresti — en ekki á meðan verið er að slá inn skor
 setInterval(refreshAll, 30000);
+
+// ---- Draga niður (swipe down) til að uppfæra allt ----
+(function(){
+  const ind = document.getElementById('pull-ind');
+  const ico = document.getElementById('pull-ico');
+  const se = document.scrollingElement || document.documentElement;
+  const TH = 70;
+  let startY = 0, pulling = false, dist = 0;
+
+  window.addEventListener('touchstart', e=>{
+    const overlayOpen = document.getElementById('map-overlay').classList.contains('open');
+    if(se.scrollTop <= 0 && !overlayOpen){ startY = e.touches[0].clientY; pulling = true; dist = 0; }
+    else pulling = false;
+  }, {passive:true});
+
+  window.addEventListener('touchmove', e=>{
+    if(!pulling) return;
+    dist = e.touches[0].clientY - startY;
+    if(dist > 0 && se.scrollTop <= 0){
+      e.preventDefault();
+      const d = Math.min(dist, 110);
+      ind.style.opacity = Math.min(d / TH, 1);
+      ind.style.transform = `translateX(-50%) translateY(${Math.min(d*0.6, 50)}px)`;
+      ico.style.transform = `rotate(${d*3}deg)`;
+      ind.classList.toggle('ready', dist > TH);
+    }
+  }, {passive:false});
+
+  window.addEventListener('touchend', ()=>{
+    if(!pulling) return;
+    pulling = false;
+    if(dist > TH){
+      ind.classList.add('spinning');
+      ind.style.opacity = '1';
+      setTimeout(()=> location.reload(), 150);
+    } else {
+      ind.style.opacity = '0';
+      ind.style.transform = 'translateX(-50%) translateY(-10px)';
+      ind.classList.remove('ready');
+    }
+  });
+})();
 </script>
 </body>
 </html>
